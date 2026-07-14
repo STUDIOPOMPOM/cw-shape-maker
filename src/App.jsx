@@ -156,8 +156,7 @@ function SizeControl({ value, onChange }) {
   };
   return (
     <div style={{ width: W, marginTop: 12 }}>
-      <div style={{ width: W, height: 1, background: "#CCCBCA" }} />
-      <div style={{ position: "relative", width: W, height: 14, marginTop: 6, cursor: "pointer" }}
+      <div style={{ position: "relative", width: W, height: 14, cursor: "pointer" }}
         onClick={setFromClientX}>
         <div style={{ position: "absolute", top: 6.5, left: 2, width: W - 4, height: 0.5, background: "#CCCBCA" }} />
         <div style={{
