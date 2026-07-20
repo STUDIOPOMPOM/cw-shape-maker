@@ -39,3 +39,10 @@ Neue Haas Unica loads from your Adobe Fonts kit (use.typekit.net/vzp5eof.css).
 In your Adobe Fonts web project settings, add the deployed domain
 (e.g. your-project.vercel.app and any custom domain) to the kit's allowed
 domains, or the font will fall back to Helvetica/Arial.
+
+## Shape Builder embeds (case-study widgets)
+Two standalone pages ship in public/ and deploy with the app:
+- /embed-4x5.html   (4:5 container)
+- /embed-16x9.html  (16:9 container)
+Shuffle-only, shape locked to 5:4, white excluded from the palette.
+Embed each in Webflow via an iframe pointing at the deployed URL.

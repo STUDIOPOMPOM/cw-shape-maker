@@ -1,0 +1,59 @@
+<!-- CW Shape Builder engine - paste ONCE into Site Settings > Custom Code > Footer (or Page Settings > Before </body>) -->
+<script>
+const mn=Math.min,mx=Math.max,fl=Math.floor;const RA = { '5:4':[1000,800], '4:5':[800,1000], '1:1':[900,900], '16:9':[1280,720], '9:16':[720,1280] };const COLORS=['#A56C38','#F9E982','#F8CCAC','#FA632B','#B0CB43','#B5DBF4','#65B07B','#C5D1FF','#A98B48','#EFEEBD'];const k1=[1.5,2.25,3.0], k2=[1.5,2.25,3.0], k3=[1.5,2.25,3.0];const k4=[2.0,2.75,3.5], k5=[1.2,1.8,2.4], k6=[1.75,2.5,3.25], k7=[0.5,0.65,0.85];const k8=[0.28,0.34,0.40], k9=[0.40,0.50,0.60], kA=[1.0,1.5,2.0], kB=[1.6,2.4,3.2];const DP = {ratio:'5:4', color:'#FA632B',
+corners:{ style:'none', which:'all', size:2 },
+edge:{ type:'none', side:'bottom', count:3, size:2 },
+sides:{ type:'none', count:3, size:2 },
+hole:{ type:'none', size:2 },};const clamp=(v,lo,hi)=>mx(lo,mn(hi,v));const fmt=n=>Math.round(n*100)/100;function qG(ratio){ const [W,H]=RA[ratio]; return [2,3,4].filter(n=>W/(2*n)<=H*0.4); }
+function qH(ratio){ const [W,H]=RA[ratio]; return W/2<=0.85*H; }
+
+function resolve(p){const [W,H]=RA[p.ratio];const U=mn(W,H)/8, PAD=U*0.4;const edge=p.edge.type!=='none'?{...p.edge}:null;let sides=p.sides.type!=='none'?{...p.sides}:null;const hole=p.hole.type!=='none'?{...p.hole}:null;const qR=p.corners.style!=='none';if(edge&&edge.type==='scallops'&&sides&&sides.type==='notch') sides=null;let qZ=0;if(sides&&sides.type==='tabs'){qZ=clamp(k6[sides.size-1]*U, U, mn(W*0.22, H*0.4));}
+const q3=qZ, q2=W-qZ, q7=q2-q3;let q8=0,qV=0,qW=0;if(edge&&edge.type==='scallops'){const counts=qG(p.ratio);const n=counts.includes(edge.count)?edge.count:counts[0];edge._count=n; q8=q7/(2*n);}
+if(edge&&edge.type==='bump') qV=clamp(k4[edge.size-1]*U,U,mn(q7/2-PAD,H*0.4));if(edge&&edge.type==='dome'){if(!qH(p.ratio)){ edge.type='bump'; qV=clamp(k4[2]*U,U,mn(q7/2-PAD,H*0.4)); }
+else qW=q7/2;}
+const qL=q8||qV||qW;const qD=edge&&edge.side==='top'?qL:0;const qC=edge&&edge.side==='bottom'?qL:0;const q4=qD, q1=H-qC, q6=q1-q4;const q5=q3+q7/2;let qX=0, qY=0;if(sides&&sides.type==='stack'){qY=clamp(sides.count,2,4);qX=clamp(k7[sides.size-1]*U, U*0.3, mn(q6/(2*qY)-2, W*0.12));}
+let qE=0,qF=0;if(sides&&(sides.type==='pinch'||sides.type==='notch')){const raw=(sides.type==='pinch'?k2:k3)[sides.size-1]*U;qE=mn(raw, q6/2-PAD*2, q7*0.32);qF=qE;}
+if(sides&&sides.type==='tabs'){qZ=mn(qZ, q6/2-PAD*2);}
+const cy=q4+q6/2;let qA=0,q9=[],qT=0,qU=0,c0=0;if(edge){if(edge.type==='bites'){const n=clamp(edge.count,1,3); edge._count=n;c0=q7/(2*n);qA=mn(k5[edge.size-1]*U, q6*0.45, c0-PAD);for(let i=0;i<n;i++)q9.push(q3+q7*(2*i+1)/(2*n));}
+if(edge.type==='arch'){qT=clamp(k8[edge.size-1]*q7,U,q7-2*PAD);qU=clamp(k9[edge.size-1]*q6,qT/2+PAD,q6-PAD);}}
+if(edge&&edge.type==='arch'&&sides&&(sides.type==='pinch'||sides.type==='notch')){qE=mn(qE,(q7-qT)/2-PAD);qF=qE;if(qE<U*0.6){ sides=null; qE=0; qF=0; }}
+if(edge&&edge.type==='bites'&&sides&&(sides.type==='pinch'||sides.type==='notch')){qA=mn(qA, q6/2-qE-PAD);if(qA<U*0.8){ qA=mx(qA,U*0.8); qE=mn(qE,q6/2-qA-PAD); qF=qE; }}
+const qS = edge && (edge.type==='scallops'||edge.type==='dome') ? edge.side : null;let qQ=qR?k1[p.corners.size-1]*U:0;let qB=p.corners.style;const qO = qX&&!qR;if(qO){ qB='round'; qQ=qX; }
+qQ=mn(qQ, mn(q7,q6)/2-1);if(sides&&(sides.type==='pinch'||sides.type==='notch')) qQ=mn(qQ, q6/2-qE-PAD);if(sides&&sides.type==='tabs') qQ=mn(qQ, q6/2-qZ-PAD);if(qX&&!qO) qQ=mn(qQ, q6/qY-qX-PAD);let qP=qQ;if(edge&&edge.type==='bites') qP=mn(qP, c0-qA-PAD);if(edge&&edge.type==='bump') qP=mn(qP, q7/2-qV-PAD);if(edge&&edge.type==='arch') qP=mn(qP, (q7-qT)/2-PAD);const clean=(v)=>(v<U*0.5?0:v);qQ=clean(mx(0,qQ)); qP=clean(mx(0,qP));const wantTop=(qR&&(p.corners.which==='all'||p.corners.which==='top'))||qO;const wantBottom=(qR&&(p.corners.which==='all'||p.corners.which==='bottom'))||qO;const topVal = edge&&edge.side==='top'?qP:qQ;const botVal = edge&&edge.side==='bottom'?qP:qQ;const cr={TL:wantTop&&qS!=='top'?topVal:0, TR:wantTop&&qS!=='top'?topVal:0,
+BR:wantBottom&&qS!=='bottom'?botVal:0, BL:wantBottom&&qS!=='bottom'?botVal:0,};let qM=null;if(hole){const sideIntrude = qF ? qF : (qX ? qX : 0);const xLo=q3+sideIntrude+PAD, xHi=q2-sideIntrude-PAD;let yLo=q4+PAD,yHi=q1-PAD;if(edge){const intrude=edge.type==='bites'?qA:edge.type==='arch'?qU:0;if(edge.side==='top')yLo=q4+intrude+PAD; else yHi=q1-intrude-PAD;}
+const freeW=xHi-xLo,freeH=yHi-yLo;const hx=(xLo+xHi)/2, hy=(yLo+yHi)/2;if(hole.type==='square'){const s=mn(kB[hole.size-1]*U, mn(freeW,freeH)-PAD);if(s>U*0.8)qM={type:'square',cx:hx,cy:hy,s};}else{const r=clamp(kA[hole.size-1]*U,U*0.5,mn(freeW,freeH)/2-PAD*0.5);if(r>U*0.3)qM={type:'circle',cx:hx,cy:hy,r};}}
+return {W,H,U,PAD,q3,q2,q7,q5,q4,q1,q6,cr,qB,
+edge,q8,qV,qW,qA,q9,qT,qU,
+sides,qF,qE,qZ,qX,qY,cy,hole:qM};}
+function fmtx(x,lo,hi){ return Math.abs(x-hi)<0.01?hi:Math.abs(x-lo)<0.01?lo:x; }
+function qJ(g){const {W,cr,q4,q1,q3,q2,q7,q5,cy}=g;const segs=[];const L=(x,y)=>segs.push({c:'L',x,y});const A=(r,sweep,x,y)=>segs.push({c:'A',r,sweep,x,y});const corner=(name,x1,y1)=>{const r=g.cr[name]; if(r<=0)return;segs.push(g.qB==='round'?{c:'A',r,sweep:1,x:x1,y:y1}:{c:'L',x:x1,y:y1});};const e=g.edge;const topFeat=e&&e.side==='top'?e.type:null;const botFeat=e&&e.side==='bottom'?e.type:null;const s=g.sides?g.sides.type:null;const qN=[];if(s==='stack')for(let j=1;j<g.qY;j++)qN.push(q4+g.q6*j/g.qY);segs.push({c:'M',x:q3+cr.TL,y:q4});if(topFeat==='dome'){A(g.qW,1,q2,q4);} else if(topFeat==='scallops'){for(let i=0;i<e._count;i++)A(g.q8,1,fmtx(q3+(i+1)*2*g.q8,q3,q2),q4);} else if(topFeat==='bites'){for(const c of g.q9){L(c-g.qA,q4);A(g.qA,0,c+g.qA,q4);}
+L(q2-cr.TR,q4);} else if(topFeat==='bump'){L(q5-g.qV,q4);A(g.qV,1,q5+g.qV,q4);L(q2-cr.TR,q4);} else if(topFeat==='arch'){const hw=g.qT/2,yD=q4+g.qU-hw;L(q5-hw,q4);L(q5-hw,yD);A(hw,0,q5+hw,yD);L(q5+hw,q4);L(q2-cr.TR,q4);} else L(q2-cr.TR,q4);corner('TR',q2,q4+cr.TR);if(s==='pinch'||s==='notch'){L(q2,cy-g.qE);if(s==='pinch')A(g.qE,0,q2,cy+g.qE);else{L(q2-g.qF,cy);L(q2,cy+g.qE);}} else if(s==='tabs'){L(q2,cy-g.qZ);A(g.qZ,1,q2,cy+g.qZ);} else if(s==='stack'){for(const yj of qN){L(q2,yj-g.qX);A(g.qX,1,q2-g.qX,yj);A(g.qX,1,q2,yj+g.qX);}}
+L(q2,q1-cr.BR);corner('BR',q2-cr.BR,q1);if(botFeat==='dome'){A(g.qW,1,q3,q1);} else if(botFeat==='scallops'){for(let i=e._count-1;i>=0;i--)A(g.q8,1,fmtx(q3+i*2*g.q8,q3,q2),q1);} else if(botFeat==='bites'){for(const c of [...g.q9].reverse()){L(c+g.qA,q1);A(g.qA,0,c-g.qA,q1);}
+L(q3+cr.BL,q1);} else if(botFeat==='bump'){L(q5+g.qV,q1);A(g.qV,1,q5-g.qV,q1);L(q3+cr.BL,q1);} else if(botFeat==='arch'){const hw=g.qT/2,yD=q1-g.qU+hw;L(q5+hw,q1);L(q5+hw,yD);A(hw,0,q5-hw,yD);L(q5-hw,q1);L(q3+cr.BL,q1);} else L(q3+cr.BL,q1);corner('BL',q3,q1-cr.BL);if(s==='pinch'||s==='notch'){L(q3,cy+g.qE);if(s==='pinch')A(g.qE,0,q3,cy-g.qE);else{L(q3+g.qF,cy);L(q3,cy-g.qE);}} else if(s==='tabs'){L(q3,cy+g.qZ);A(g.qZ,1,q3,cy-g.qZ);} else if(s==='stack'){for(const yj of [...qN].reverse()){L(q3,yj+g.qX);A(g.qX,1,q3+g.qX,yj);A(g.qX,1,q3,yj-g.qX);}}
+L(q3,q4+cr.TL);corner('TL',q3+cr.TL,q4);segs.push({c:'Z'});const holes=[];if(g.hole){const h=g.hole;if(h.type==='square'){const q=h.s/2;holes.push([
+{c:'M',x:h.cx-q,y:h.cy-q},{c:'L',x:h.cx+q,y:h.cy-q},
+{c:'L',x:h.cx+q,y:h.cy+q},{c:'L',x:h.cx-q,y:h.cy+q},{c:'Z'},
+]);}else{holes.push([
+{c:'M',x:h.cx+h.r,y:h.cy},
+{c:'A',r:h.r,sweep:1,x:h.cx-h.r,y:h.cy},
+{c:'A',r:h.r,sweep:1,x:h.cx+h.r,y:h.cy},
+{c:'Z'},
+]);}}
+return {outline:segs,holes};}
+function qK(list){return list.map(x=>
+x.c==='M'?`M ${fmt(x.x)} ${fmt(x.y)}`:
+x.c==='L'?`L ${fmt(x.x)} ${fmt(x.y)}`:
+x.c==='A'?`A ${fmt(x.r)} ${fmt(x.r)} 0 0 ${x.sweep} ${fmt(x.x)} ${fmt(x.y)}`:'Z').join(' ');}
+function bS(params){const p={...DP,...params,
+corners:{...DP.corners,...(params.corners||{})},
+edge:{...DP.edge,...(params.edge||{})},
+sides:{...DP.sides,...(params.sides||{})},
+hole:{...DP.hole,...(params.hole||{})}};const g=resolve(p);const {outline,holes}=qJ(g);const d=[qK(outline),...holes.map(qK)].join(' ');const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.W} ${g.H}" width="${g.W}" height="${g.H}"><path d="${d}" fill="${p.color}" fill-rule="evenodd"/></svg>`;return {d,svg,W:g.W,H:g.H,geo:g,params:p,outline,holes};}
+function pick(arr,rng){return arr[fl(rng()*arr.length)];}
+function rP(ratio,rng=Math.random){const p=JSON.parse(JSON.stringify(DP));p.ratio=ratio||pick(Object.keys(RA),rng);p.color=pick(COLORS,rng);const first=pick(['corners','edge','sides'],rng);const two=rng()<0.55;let second=null;if(two)second=pick(['corners','edge','sides','hole','hole'].filter(c=>c!==first),rng);for(const cat of [first,second]){if(!cat)continue;if(cat==='corners')p.corners={style:pick(['round','chamfer'],rng),which:pick(['all','top','bottom'],rng),size:1+fl(rng()*3)};if(cat==='edge'){const types=p.sides.type==='notch'?['bites','arch','bump']:['scallops','bites','arch','bump'];if(qH(p.ratio))types.push('dome');const type=pick(types,rng);const count=type==='scallops'?pick(qG(p.ratio),rng):1+fl(rng()*3);p.edge={type,side:pick(['top','bottom'],rng),count,size:1+fl(rng()*3)};}
+if(cat==='sides'){const sOpts=p.edge.type==='scallops'?['pinch','tabs','stack']:['pinch','notch','tabs','stack'];p.sides={type:pick(sOpts,rng),count:2+fl(rng()*3),size:1+fl(rng()*3)};}
+if(cat==='hole')p.hole={type:rng()<0.65?'circle':'square',size:1+fl(rng()*3)};}
+return p;}
+
+window.CWSB={bS:bS,rP:rP,DP:DP};
+</script>

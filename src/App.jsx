@@ -1,9 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { RATIOS, COLORS, DEFAULT_PARAMS, PRESETS, buildShape, randomParams, validScallopCounts, domeAvailable, activeCategories } from "./engine.js";
 
-// ============================================================
-// EXPORT (SVG exact path; PNG 2560px long edge, transparent)
-// ============================================================
 const EXPORT_LONG_EDGE = 2560;
 function download(blob, name) {
   const url = URL.createObjectURL(blob);
@@ -103,6 +100,7 @@ const CSS = `
   cursor: pointer; padding: 0;
 }
 .cwsm-swatch.selected { outline: 1px solid #191814; outline-offset: 2px; }
+.cwsm-swatch.disabled { opacity: 0.15; pointer-events: none; cursor: default; }
 .cwsm-step-btn {
   background: none; border: none; font-family: inherit; font-size: 12px; font-weight: 500;
   color: #191814; cursor: pointer; width: 18px; height: 25px; line-height: 25px;
@@ -316,11 +314,14 @@ export default function CWShapeMaker() {
 
             <Group label="Colour">
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4, width: 210 }}>
-                {UI_COLORS.map((c) => (
-                  <button key={c.hex} title={c.name}
-                    className={"cwsm-swatch" + (params.color === c.hex ? " selected" : "")}
-                    style={{ background: c.hex }} onClick={() => set({ color: c.hex })} />
-                ))}
+                {UI_COLORS.map((c) => {
+                  const clash = c.hex === bg;
+                  return (
+                    <button key={c.hex} title={clash ? c.name + " — matches the background" : c.name}
+                      className={"cwsm-swatch" + (params.color === c.hex ? " selected" : "") + (clash ? " disabled" : "")}
+                      style={{ background: c.hex }} onClick={() => set({ color: c.hex })} />
+                  );
+                })}
               </div>
             </Group>
 
@@ -399,10 +400,14 @@ export default function CWShapeMaker() {
         position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <div style={{ position: "absolute", top: 30, right: 40, display: "flex", gap: 4 }}>
-          {[["#FFFAF5", "Linen"], ["#191814", "Charcoal"], ["#CCCBCA", "Concrete"]].map(([hex, name]) => (
-            <button key={hex} title={name} className={"cwsm-swatch" + (bg === hex ? " selected" : "")}
-              style={{ background: hex }} onClick={() => setBg(hex)} />
-          ))}
+          {[["#FFFAF5", "Linen"], ["#191814", "Charcoal"], ["#CCCBCA", "Concrete"]].map(([hex, name]) => {
+            const clash = hex === params.color;
+            return (
+              <button key={hex} title={clash ? name + " — matches the shape colour" : name}
+                className={"cwsm-swatch" + (bg === hex ? " selected" : "") + (clash ? " disabled" : "")}
+                style={{ background: hex }} onClick={() => setBg(hex)} />
+            );
+          })}
         </div>
         <div style={{
           width: "58%", height: "62%", minWidth: 200,
